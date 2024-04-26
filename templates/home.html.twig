@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+{% block title %}
+	Accueil
+{% endblock %}
+{% block body %}
+	<h1>Nos produits phares</h1>
+	<div class="row">
+		{% for i in 1..3 %}
+			<div class="col">
+				<div class="card">
+					<img src="https://picsum.photos/200/200" alt="Imgage du produit" class="img-fluid">
+					<div class="card-body">
+						<h4>Super chaise en bois</h4>
+						<div class="card-text">
+							Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+						</div>
+						<a href="#" class="btn btn-primary btn-sm">Details</a>
+						<a href="#" class="btn btn-succcess btn-sm">Ajouter</a>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+		<hr>
+		<h2>Un service irreprochable</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Debitis totam fugit cupiditate? Vitae, cumque rem?</p>
+		<div class="row">
+			{% include "shared/_assurance.html.twig" with {
+                'color': 'primary',
+                'icon': 'fas fa-truck',
+                'text': "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores vero magni, vel commodi inventore eaque?",
+            } %}
+			{% include "shared/_assurance.html.twig" with {
+                'color': 'success',
+                'icon': 'fas fa-check',
+                'text': "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores vero magni, vel commodi inventore eaque?",
+            } %}
+			{% include "shared/_assurance.html.twig" with {
+                'color': 'warning',
+                'icon': 'fas fa-lock',
+                'text': "Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores vero magni, vel commodi inventore eaque?",
+            } %}
+		</div>
+	</div>
+{% endblock %}
