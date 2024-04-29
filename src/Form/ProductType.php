@@ -37,7 +37,8 @@ class ProductType extends AbstractType
             'label' => 'Prix du produit',
             'attr' => [
                 'placeholder' => 'Tapez le prix du produit en €'
-            ]
+            ],
+            'divisor' => 100
         ])
 
         ->add('mainPicture', UrlType::class, [
@@ -56,7 +57,8 @@ class ProductType extends AbstractType
         ])
         ;
 
-        $builder->get('price')->addModelTransformer(new CentimesTransformer());
+    // Commented or delete because use divisor of moneytype
+    //    $builder->get('price')->addModelTransformer(new CentimesTransformer());
     }
 
     public function configureOptions(OptionsResolver $resolver): void
