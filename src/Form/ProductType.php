@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Form\DataTransformer\CentimesTransformer;
 use Doctrine\Common\Collections\Expr\Value;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -55,20 +56,7 @@ class ProductType extends AbstractType
         ])
         ;
 
-        $builder->get('price')->addModelTransformer(new CallbackTransformer(
-            function($value) { 
-                if($value === null) {
-                    return;
-                }
-                return $value / 100; 
-            },
-            function($value) { 
-                if($value === null) {
-                    return;
-                }
-                return $value * 100;
-            }
-        ));
+        $builder->get('price')->addModelTransformer(new CentimesTransformer());
     }
 
     public function configureOptions(OptionsResolver $resolver): void
