@@ -4,9 +4,11 @@ namespace App\Form;
 
 use App\Entity\Product;
 use App\Entity\Category;
+use Doctrine\Common\Collections\Expr\Value;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -52,6 +54,21 @@ class ProductType extends AbstractType
             }
         ])
         ;
+
+        $builder->get('price')->addModelTransformer(new CallbackTransformer(
+            function($value) { 
+                if($value === null) {
+                    return;
+                }
+                return $value / 100; 
+            },
+            function($value) { 
+                if($value === null) {
+                    return;
+                }
+                return $value * 100;
+            }
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
