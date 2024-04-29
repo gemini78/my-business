@@ -45,6 +45,37 @@ class ProductController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/product/{id}/edit', name: 'product_edit')]
+    public function edit($id, Request $request, ProductRepository $productRepository, EntityManagerInterface $em, SluggerInterface $slugger)
+    {
+        $product = $productRepository->find($id);
+        if(!$product) {
+            throw $this->createNotFoundException("Le produit demandé n'éxiste pas");
+        }
+
+        $form = $this->createForm(ProductType::class, $product);
+            
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $product->setSlug(strtolower($slugger->slug($product->getName())));
+            $em->flush();
+
+            return $this->redirectToRoute('product_show', [
+                'category_slug' => $product->getCategory()->getSlug(),
+                'slug' => $product->getSlug()
+            ]);
+
+        }
+
+        $formView = $form->createView();
+
+        return $this->render('product/edit.html.twig', [
+            'product' => $product,
+            'formView' => $formView
+        ]);
+    }
+
     #[Route('/admin/product/create', name: 'product_create')]
     public function create(Request $request, SluggerInterface $slugger, EntityManagerInterface $em)
     {
@@ -57,7 +88,11 @@ class ProductController extends AbstractController
             $product->setSlug(strtolower($slugger->slug($product->getName())));
             $em->persist($product);
             $em->flush();
-            dd($product);
+
+            return $this->redirectToRoute('product_show', [
+                'category_slug' => $product->getCategory()->getSlug(),
+                'slug' => $product->getSlug()
+            ]);
         }
 
         $formView = $form->createView();
