@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
@@ -11,9 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProductController extends AbstractController
 {
+
     #[Route('/{slug}', name: 'product_category')]
     public function category($slug, CategoryRepository $categoryRepository): Response
     {
@@ -46,7 +49,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/admin/product/{id}/edit', name: 'product_edit')]
-    public function edit($id, Request $request, ProductRepository $productRepository, EntityManagerInterface $em, SluggerInterface $slugger)
+    public function edit($id, Request $request, ProductRepository $productRepository, EntityManagerInterface $em, SluggerInterface $slugger, ValidatorInterface $validator)
     {
         $product = $productRepository->find($id);
         if(!$product) {
@@ -57,7 +60,7 @@ class ProductController extends AbstractController
             
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $product->setSlug(strtolower($slugger->slug($product->getName())));
             $em->flush();
 
@@ -65,14 +68,11 @@ class ProductController extends AbstractController
                 'category_slug' => $product->getCategory()->getSlug(),
                 'slug' => $product->getSlug()
             ]);
-
-        }
-
-        $formView = $form->createView();
+        } 
 
         return $this->render('product/edit.html.twig', [
             'product' => $product,
-            'formView' => $formView
+            'formView' =>$form->createView(),
         ]);
     }
 
@@ -83,7 +83,7 @@ class ProductController extends AbstractController
             
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $product = $form->getData();
             $product->setSlug(strtolower($slugger->slug($product->getName())));
             $em->persist($product);
