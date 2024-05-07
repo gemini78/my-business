@@ -16,13 +16,13 @@ security:
     main:
       lazy: true
       provider: app_user_provider
-      custom_authenticator: App\Security\LoginFormAuthenticator
+      # custom_authenticator: App\Security\LoginFormAuthenticator
 
-      # form_login:
-      #   login_path: security_login
-      #   check_path: security_login
-      #   username_parameter: login[email]
-      #   password_parameter: login[password]
+      form_login:
+        login_path: security_login
+        check_path: security_login
+        username_parameter: login[email]
+        password_parameter: login[password]
 
       logout:
         path: security_logout

@@ -42,6 +42,8 @@ class CategoryController extends AbstractController
     #[Route('/admin/category/{id}/edit', name: 'category_edit')]
     public function edit($id, CategoryRepository $categoryRepository, Request $request, EntityManagerInterface $em, SluggerInterface $slugger)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, "Vous n'avez pas le droit d'accéder à cette ressource");
+
         $category = $categoryRepository->find($id);
 
         if(!$category) {
