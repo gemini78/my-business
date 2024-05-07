@@ -19,20 +19,7 @@
 	<div class="row">
 		{% for p in category.products %}
 			<div class="col-3">
-				<div class="card">
-					<img src="{{ p.mainPicture }}" alt="Imgage du produit" class="img-fluid">
-					<div class="card-body">
-						<h4>{{ p.name }}
-							({{ p.price / 100 }}
-							&euro;)</h4>
-						<span class="badge bg-info">
-							{{ p.category.name }}
-						</span>
-						<div class="card-text">{{ p.shortDescription }}</div>
-						<a href="{{ path('product_show', {'category_slug': p.category.slug ,'slug': p.slug }) }}" class="btn btn-primary btn-sm">Details</a>
-						<a href="#" class="btn btn-succcess btn-sm">Ajouter</a>
-					</div>
-				</div>
+				{% include "product/_product_card.html.twig" %}
 			</div>
 		{% endfor %}
 	</div>
