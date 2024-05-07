@@ -14,21 +14,23 @@ class CartService
 
     public function add(int $id)
     {
-        $cart = $this->requestStack->getSession()->get('cart', []);
+        $cart = $this->getCart();
 
-        if(array_key_exists($id, $cart)) {
-            $cart[$id]++;
-        } else {
-            $cart[$id] = 1;
+        if(!array_key_exists($id, $cart)) {
+            $cart[$id] = 0;
         }
-        $this->requestStack->getSession()->set('cart', $cart);
+        
+        $cart[$id]++;
+        
+
+        $this->saveCart($cart);
     }
 
     public function getTotal(): int
     {
         $total = 0;
 
-        foreach ($this->requestStack->getSession()->get('cart', []) as $id => $qty) {
+        foreach ($this->getCart() as $id => $qty) {
             $product = $this->productRepository->find($id);
             if(!$product) {
                 continue;
@@ -42,9 +44,8 @@ class CartService
     public function getDetailedCartItems(): array
     {
         $detailedCart = [];
-        $total = 0;
 
-        foreach ($this->requestStack->getSession()->get('cart', []) as $id => $qty) {
+        foreach ($this->getCart() as $id => $qty) {
             $product = $this->productRepository->find($id);
             if(!$product) {
                 continue;
@@ -57,16 +58,16 @@ class CartService
 
     public function remove(int $id)
     {
-        $cart = $this->requestStack->getSession()->get('cart', []);
+        $cart = $this->getCart();
 
         unset($cart[$id]);
 
-        $this->requestStack->getSession()->set('cart', $cart);
+        $this->saveCart($cart);
     }
 
     public function decrement(int $id)
     {
-        $cart = $this->requestStack->getSession()->get('cart', []);
+        $cart = $this->getCart();
 
         if(!array_key_exists($id, $cart)) {
             return;
@@ -76,9 +77,19 @@ class CartService
             $this->remove($id);
             return;
         }
-        
+
         $cart[$id]--;
 
+        $this->saveCart($cart);
+    }
+
+    protected function getCart(): array
+    {
+        return $this->requestStack->getSession()->get('cart', []);
+    }
+
+    protected function saveCart(array $cart)
+    {
         $this->requestStack->getSession()->set('cart', $cart);
     }
 }
