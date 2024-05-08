@@ -6,6 +6,8 @@ use App\Entity\Category;
 use App\Entity\Product;
 use App\Entity\Purchase;
 use App\Entity\User;
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -81,6 +83,7 @@ class AppFixtures extends Fixture
                 ->setCity($faker->city)
                 ->setUser($faker->randomElement($users))
                 ->setTotal(mt_rand(2000, 30000))
+                ->setPurchaseAt(new DateTimeImmutable())
                 ;
             
             if($faker->boolean(90)) {

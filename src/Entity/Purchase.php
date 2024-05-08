@@ -39,6 +39,9 @@ class Purchase
     #[ORM\ManyToOne(inversedBy: 'purchases')]
     private ?User $user = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $purchaseAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -124,6 +127,18 @@ class Purchase
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPurchaseAt(): ?\DateTimeImmutable
+    {
+        return $this->purchaseAt;
+    }
+
+    public function setPurchaseAt(\DateTimeImmutable $purchaseAt): static
+    {
+        $this->purchaseAt = $purchaseAt;
 
         return $this;
     }
