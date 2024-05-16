@@ -26,6 +26,11 @@ class CartService
         $this->saveCart($cart);
     }
 
+    public function empty() 
+    {
+        $this->saveCart([]);
+    }
+
     public function getTotal(): int
     {
         $total = 0;
@@ -41,6 +46,7 @@ class CartService
         return $total;
     }
 
+    /** @return CartItem[] */
     public function getDetailedCartItems(): array
     {
         $detailedCart = [];
