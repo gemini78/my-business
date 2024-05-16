@@ -6,6 +6,7 @@ use App\Cart\CartService;
 use App\Entity\Purchase;
 use App\Entity\PurchaseItem;
 use App\Form\CartConfirmationType;
+use App\Purchase\PurchasePersister;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,12 +19,13 @@ class PurchaseConfirmationController extends AbstractController
 {
     public function __construct(
         protected CartService $cartService,
-        protected EntityManagerInterface $em
-    )
-    {}
+        protected EntityManagerInterface $em,
+        protected PurchasePersister $purchasePersister
+    ) {
+    }
 
     #[Route('/purchase/confirm', name: 'purchase_confirm')]
-    #[IsGranted('ROLE_USER', message:"Vous devez être connecté pour confirmer une commande")]
+    #[IsGranted('ROLE_USER', message: "Vous devez être connecté pour confirmer une commande")]
     public function confirm(Request $request)
     {
         $form = $this->createForm(CartConfirmationType::class);
@@ -31,43 +33,23 @@ class PurchaseConfirmationController extends AbstractController
         $form->handleRequest($request);
 
         if (!$form->isSubmitted()) {
-          $this->addFlash('warning', "Vous devez remplir le formulaire de confirmation");
-          return $this->redirectToRoute('cart_show');
+            $this->addFlash('warning', "Vous devez remplir le formulaire de confirmation");
+            return $this->redirectToRoute('cart_show');
         }
 
-        $user = $this->getUser();
-
         $cartItems = $this->cartService->getDetailedCartItems();
-        if( count($cartItems) === 0 ) {
+        if (count($cartItems) === 0) {
             $this->addFlash('warning', "Vous ne pouvez pas confirmer une commande avec un panier vide");
             return $this->redirectToRoute('cart_show');
         }
 
         /** @var Purchase */
         $purchase = $form->getData();
-        
-        $purchase->setUser($user)
-            ->setPurchaseAt(DateTimeImmutable::createFromMutable(new DateTime()))
-            ->setTotal($this->cartService->getTotal());
-        
-        $this->em->persist($purchase);
 
-        foreach ($this->cartService->getDetailedCartItems() as $cartItem) {
-            $purchaseItem = new PurchaseItem();
-            $purchaseItem->setPurchase($purchase)
-                ->setProduct($cartItem->product)
-                ->setProductName($cartItem->product->getName())
-                ->setProductPrice($cartItem->product->getPrice())
-                ->setQuantity($cartItem->qty)
-                ->setTotal($cartItem->getTotal());
-            
-            $this->em->persist($purchaseItem);
-        }
-
-        $this->em->flush();
+        $this->purchasePersister->storePurchase($purchase);
 
         $this->cartService->empty();
-        
+
         $this->addFlash('success', "La commande a bien été enregistrée");
         return $this->redirectToRoute('purchases_index');
     }
