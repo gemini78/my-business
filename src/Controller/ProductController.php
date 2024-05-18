@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Event\ProductViewEvent;
 use App\Form\ProductType;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,12 +19,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ProductController extends AbstractController
 {
 
-    #[Route('/{slug}', name: 'product_category', priority:-1)]
+    #[Route('/{slug}', name: 'product_category', priority: -1)]
     public function category($slug, CategoryRepository $categoryRepository): Response
     {
-        $category = $categoryRepository->findOneBy([ 'slug' => $slug]);
+        $category = $categoryRepository->findOneBy(['slug' => $slug]);
 
-        if(!$category) {
+        if (!$category) {
             throw $this->createNotFoundException("La page demandée n'existe pas");
         }
 
@@ -32,16 +34,19 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/{category_slug}/{slug}', name: 'product_show', priority:-1)]
-    public function show($slug, ProductRepository $productRepository) 
+    #[Route('/{category_slug}/{slug}', name: 'product_show', priority: -1)]
+    public function show($slug, ProductRepository $productRepository, EventDispatcherInterface $dispatcher)
     {
         $product = $productRepository->findOneBy([
             'slug' => $slug
         ]);
 
-        if(!$product) {
+        if (!$product) {
             throw $this->createNotFoundException("Le produit demandé n'existe pas");
         }
+
+        $productView = new ProductViewEvent($product);
+        $dispatcher->dispatch($productView, 'product.view');
 
         return $this->render('product/show.html.twig', [
             'product' => $product,
@@ -52,12 +57,12 @@ class ProductController extends AbstractController
     public function edit($id, Request $request, ProductRepository $productRepository, EntityManagerInterface $em, SluggerInterface $slugger, ValidatorInterface $validator)
     {
         $product = $productRepository->find($id);
-        if(!$product) {
+        if (!$product) {
             throw $this->createNotFoundException("Le produit demandé n'éxiste pas");
         }
 
         $form = $this->createForm(ProductType::class, $product);
-            
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -68,11 +73,11 @@ class ProductController extends AbstractController
                 'category_slug' => $product->getCategory()->getSlug(),
                 'slug' => $product->getSlug()
             ]);
-        } 
+        }
 
         return $this->render('product/edit.html.twig', [
             'product' => $product,
-            'formView' =>$form->createView(),
+            'formView' => $form->createView(),
         ]);
     }
 
@@ -80,7 +85,7 @@ class ProductController extends AbstractController
     public function create(Request $request, SluggerInterface $slugger, EntityManagerInterface $em)
     {
         $form = $this->createForm(ProductType::class);
-            
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
