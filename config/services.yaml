@@ -29,4 +29,11 @@ services:
       $domain: "%env(MY_DOMAIN_FOR_STRIPE)%"
 
   App\Doctrine\Listener\ProductSlugListener:
-    tags: [{ name: "doctrine.event_listener", event: prePersist }]
+    tags:
+      [
+        {
+          name: "doctrine.orm.entity_listener",
+          event: prePersist,
+          entity: App\Entity\Product,
+        },
+      ]
