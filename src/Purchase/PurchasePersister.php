@@ -18,9 +18,9 @@ class PurchasePersister
 
     public function storePurchase(Purchase $purchase)
     {
-        $purchase->setUser($this->security->getUser())
-            ->setPurchaseAt(DateTimeImmutable::createFromMutable(new DateTime()))
-            ->setTotal($this->cartService->getTotal());
+        $purchase->setUser($this->security->getUser());
+        /*  ->setPurchaseAt(DateTimeImmutable::createFromMutable(new DateTime())) */
+        /* ->setTotal($this->cartService->getTotal()); */
 
         $this->em->persist($purchase);
 
