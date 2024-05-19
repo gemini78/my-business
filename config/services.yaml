@@ -27,3 +27,6 @@ services:
     arguments:
       $stripeSecretKey: "%env(STRIPE_SECRET_KEY)%"
       $domain: "%env(MY_DOMAIN_FOR_STRIPE)%"
+
+  App\Doctrine\Listener\ProductSlugListener:
+    tags: [{ name: "doctrine.event_listener", event: prePersist }]
