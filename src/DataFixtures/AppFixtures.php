@@ -56,7 +56,7 @@ class AppFixtures extends Fixture
 
             $category
                 ->setName($faker->words(mt_rand(2, 4), true))
-                ->setSlug(strtolower($this->slugger->slug($category->getName())))
+                // ->setSlug(strtolower($this->slugger->slug($category->getName())))
                 ->setOwner($faker->randomElement($users));
 
             $manager->persist($category);
