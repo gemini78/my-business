@@ -81,9 +81,9 @@ class AppFixtures extends Fixture
             $purchase = new Purchase();
             $purchase
                 ->setFullName($faker->words(mt_rand(2, 4), true))
-                ->setAddress($faker->streetAddress)
-                ->setPostalCode($faker->postcode)
-                ->setCity($faker->city)
+                ->setAddress($faker->streetAddress())
+                ->setPostalCode($faker->postcode())
+                ->setCity($faker->city())
                 ->setUser($faker->randomElement($users))
                 ->setTotal(mt_rand(2000, 30000))
                 ->setPurchaseAt(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-6months')));
